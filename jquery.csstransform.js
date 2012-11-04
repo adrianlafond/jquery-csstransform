@@ -32,8 +32,9 @@
           return getStyle(this[0], arguments[0])
 
         case 'matrix':
-        case 'matrix3d':
           return getMatrix(this[0]) || MATRIX
+        case 'matrix3d':
+          return getMatrix(this[0]) || MATRIX_3D
 
         case 'scale':
         case 'scaleX':
@@ -51,7 +52,7 @@
         case 'skewY':
           return getStyleFromMatrix(this[0], arguments[0])
         default:
-          return null
+          return this.css(arguments[0])
       }
     }
 
@@ -218,7 +219,7 @@
       case 'scale':
         return [matrix[0], matrix[3]]
       case 'rotate':
-        return [Math.acos(matrix[0]), Math.acos(matrix[1])]
+        return Math.acos(matrix[0])
       case 'translateX':
         return matrix[4]
       case 'translateY':

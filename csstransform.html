@@ -22,7 +22,7 @@
     width: 360px; height: 360px;
     background: #f00;
     /*-webkit-transform: scale(2, 0.5);*/
-    /*-webkit-transform: rotate(45deg);*/
+    -webkit-transform: rotate(45deg);
     /*-webkit-transform: translate(100px, 200px);*/
     /*-webkit-transform: skew(5deg, 10deg);*/
 
@@ -44,7 +44,7 @@
 
     //console.log(window.getComputedStyle(plane)['webkitTransform'])
     console.log($plane.csstransform('matrix'))
-    console.log($plane.csstransform('skewX'))
+    console.log($plane.csstransform('rotate') * 180 / Math.PI)
 
     //console.log(window.getComputedStyle($plane[0])['OTransform'])
     //console.log(window.getComputedStyle($plane[0])['MozTransform'])
