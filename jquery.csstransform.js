@@ -14,7 +14,23 @@
 
   
   $.fn.csstransform = function() {
-    var args = arguments
+    var argsLen = arguments.length
+
+    if (argsLen === 1) {
+      switch (arguments[0]) {
+        case 'transform':
+        case 'transformOrigin':
+        case 'transform-origin':
+        case 'transformStyle':
+        case 'transform-style':
+        case 'perspective':
+        case 'perspectiveOrigin':
+        case 'perspective-origin':
+          return getStyle(this[0], arguments[0])
+        default:
+          return null
+      }
+    }
 
     return this.each(function () {
       var $el = $(this),
@@ -26,8 +42,7 @@
         $el.data('csstransform', transform)
       }
 
-      console.log(transform.execute(args))
-      return transform.execute(args)
+      return transform.execute(arguments)
     })
   }
 
@@ -47,21 +62,22 @@
     execute: function (args) {
       var arg0 = args[0],
           arg1 = args[1]
-      switch (arg0) {
-        case 'transform':
-        case 'transformOrigin':
-        case 'transform-origin':
-        case 'transformStyle':
-        case 'transform-style':
-        case 'perspective':
-        case 'perspectiveOrigin':
-        case 'perspective-origin':
-          return und(arg1) ? this.get(arg0) : this.set(arg0, arg1)
-        case 'animate':
-          return this.animate(args)
-        default:
-          return null
-      }
+      // switch (arg0) {
+      //   case 'transform':
+      //   case 'transformOrigin':
+      //   case 'transform-origin':
+      //   case 'transformStyle':
+      //   case 'transform-style':
+      //   case 'perspective':
+      //   case 'perspectiveOrigin':
+      //   case 'perspective-origin':
+      //     return und(arg1) ? this.get(arg0) : this.set(arg0, arg1)
+      //   case 'animate':
+      //     return this.animate(args)
+      //   default:
+      //     return null
+      // }
+      return this.set(arg0, arg1)
     },
 
     style: function (prop, value) {
@@ -116,24 +132,8 @@
       //
     },
 
-
-    /**
-     * @returns the relevant name of a prefixed property.
-     */
-    prop: function (propName) {
-      var i = 0,
-          withPrefix
-      if (propName in this.el.style) {
-        return propName
-      } else {
-        propName = propName.charAt(0).toUpperCase() + propName.substr(1)
-        for (; i < prefixLen; i++) {
-          withPrefix = prefix[i] + propName
-          if (withPrefix in this.el.style) {
-            return withPrefix
-          }
-        }
-      }
+    prop: function (attr) {
+      return getProp(this.el, attr)
     }
   }
 
@@ -152,6 +152,38 @@
     return 0
   }
 
+
+  /**
+   * 
+   */
+  function getStyle(el, prop) {
+    var style = (el && 'getComputedStyle' in window) ? window.getComputedStyle(el) : null
+    return style ? style[getProp(el, prop)] : null
+  }
+
+
+  /**
+   * @returns the relevant name of a prefixed property.
+   */
+  function getProp(el, propName) {
+    var i = 0,
+        withPrefix
+    if (propName in el.style) {
+      return propName
+    } else {
+      propName = propName.charAt(0).toUpperCase() + propName.substr(1)
+      for (; i < prefixLen; i++) {
+        withPrefix = prefix[i] + propName
+        if (withPrefix in el.style) {
+          return withPrefix
+        }
+      }
+    }
+  }
+
+  /**
+   * For convenience.
+   */
   function und(value) {
     return typeof value === 'undefined'
   }
