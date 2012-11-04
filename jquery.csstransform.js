@@ -9,7 +9,10 @@
   'use strict'
 
   var prefix = ['ms', 'webkit', 'Moz', 'O'],
-      prefixLen = prefix.length
+      prefixLen = prefix.length,
+
+      MATRIX = [1, 0, 0, 1, 0, 0],
+      MATRIX_3D = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 
 
   
@@ -27,6 +30,26 @@
         case 'perspectiveOrigin':
         case 'perspective-origin':
           return getStyle(this[0], arguments[0])
+
+        case 'matrix':
+        case 'matrix3d':
+          return getMatrix(this[0]) || MATRIX
+
+        case 'scale':
+        case 'scaleX':
+        case 'scaleY':
+        case 'rotate':
+        case 'rotateX':
+        case 'rotateY':
+        case 'rotateZ':
+        case 'translate':
+        case 'translateX':
+        case 'translateY':
+        case 'translateZ':
+        case 'skew':
+        case 'skewX':
+        case 'skewY':
+          return getStyleFromMatrix(this[0], arguments[0])
         default:
           return null
       }
@@ -52,6 +75,15 @@
   }
 
 
+  $.fn.csstransform.degrees = function (radians) {
+    return r2d(radians)
+  }
+
+  $.fn.csstransform.radians = function (degrees) {
+    return d2r(degrees)
+  }
+
+
   function CssTransform(el) {
     this.el = el
     return this
@@ -62,21 +94,6 @@
     execute: function (args) {
       var arg0 = args[0],
           arg1 = args[1]
-      // switch (arg0) {
-      //   case 'transform':
-      //   case 'transformOrigin':
-      //   case 'transform-origin':
-      //   case 'transformStyle':
-      //   case 'transform-style':
-      //   case 'perspective':
-      //   case 'perspectiveOrigin':
-      //   case 'perspective-origin':
-      //     return und(arg1) ? this.get(arg0) : this.set(arg0, arg1)
-      //   case 'animate':
-      //     return this.animate(args)
-      //   default:
-      //     return null
-      // }
       return this.set(arg0, arg1)
     },
 
@@ -114,20 +131,6 @@
       }
     },
 
-    get: function (attr) {
-      switch (attr) {
-        case 'transform':
-        case 'perspective':
-          return window.getComputedStyle(this.el)[this.prop(attr)]
-        case 'matrix':
-        case 'matrix3d':
-          return 0
-        default:
-          return this.el.style[this.prop(attr)]
-      }
-    },
-
-
     animate: function () {
       //
     },
@@ -162,6 +165,90 @@
   }
 
 
+  function getMatrix(el) {
+    var matrix = getStyle(el, 'transform')
+    return (matrix && matrix !== 'none') ? convertMatrixToArray(matrix) : null
+  }
+
+
+  function getStyleFromMatrix(el, prop) {
+    var matrix = getMatrix(el)
+
+    if (!matrix) {
+      switch (prop) {
+        case 'scaleX':
+        case 'scaleY':
+          return 1
+        case 'scale':
+          return [1, 1]
+        case 'translate':
+        case 'skew':
+          return [0, 0]
+        case 'translate3d':
+          return [0, 0, 0]
+        case 'scale3d':
+          return [1, 1, 1]
+        case 'rotate3d':
+          // @see https://developer.mozilla.org/en-US/docs/CSS/transform-function
+          return [0, 0, 0, 0]
+      }
+      return 0
+    }
+
+    if (matrix.length > 6) {
+      return 0
+    } else {
+      return getMatrixProp2d(matrix, prop)
+    }
+    return 0
+  }
+
+
+  /**
+   * @param {array} matrix An array of matrix numbers (not the raw string transform output).
+   * @param {string} prop The property we want a result for.
+   * @returns {number}
+   */
+  function getMatrixProp2d(matrix, prop) {
+    switch (prop) {
+      case 'scaleX':
+        return matrix[0]
+      case 'scaleY':
+        return matrix[3]
+      case 'scale':
+        return [matrix[0], matrix[3]]
+      case 'rotate':
+        return [Math.acos(matrix[0]), Math.acos(matrix[1])]
+      case 'translateX':
+        return matrix[4]
+      case 'translateY':
+        return matrix[5]
+      case 'translate':
+        return [matrix[4], matrix[5]]
+      case 'skewX':
+        return Math.atan(matrix[2])
+      case 'skewY':
+        return Math.atan(matrix[1])
+      case 'skew':
+        return [Math.atan(matrix[2]), Math.atan(matrix[1])]
+    }
+    return 0
+  } 
+
+
+  function convertMatrixToArray(matrix) {
+    var nums
+    if (!matrix || matrix === 'none') {
+      return []
+    }
+    nums = matrix.match(/-?\d+.+\d+/gi)[0].split(', ')
+    $(nums).each(function (i, num) {
+      nums[i] = parseFloat(num)
+    })
+    return nums
+  }
+
+
   /**
    * @returns the relevant name of a prefixed property.
    */
@@ -188,9 +275,12 @@
     return typeof value === 'undefined'
   }
 
-
-
-  function matrix(value) {
-    //
+  function r2d(radians) {
+    return radians * 180 / Math.PI
   }
+
+  function d2r(degrees) {
+    return degrees * Math.PI / 180
+  }
+
 }(jQuery));

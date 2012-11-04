@@ -13,6 +13,7 @@
   <style>
   .group {
     -webkit-perspective: 800px;
+    -webkit-transform-style: preserve-3d;
   }
 
   .plane {
@@ -20,8 +21,12 @@
     left: 100px; top: 100px;
     width: 360px; height: 360px;
     background: #f00;
-    -webkit-transform: rotate(45deg);
-    /*-webkit-transform: rotateX(45deg) rotateY(45deg);*/
+    /*-webkit-transform: scale(2, 0.5);*/
+    /*-webkit-transform: rotate(45deg);*/
+    /*-webkit-transform: translate(100px, 200px);*/
+    /*-webkit-transform: skew(5deg, 10deg);*/
+
+    /*-webkit-transform: rotateX(45deg);*/
     /*-moz-transform: rotateX(45deg) rotateY(45deg);*/
     /*-moz-transform: rotate(45deg) translateZ(100px);*/
     /*-o-transform: rotate(45deg);*/
@@ -35,12 +40,15 @@
     var $body = $('body'),
         $group = $('.group'),
         $plane = $('.plane')
+        plane = $plane[0]
 
-    console.log($group.csstransform('perspective'))
+    //console.log(window.getComputedStyle(plane)['webkitTransform'])
+    console.log($plane.csstransform('matrix'))
+    console.log($plane.csstransform('skewX'))
 
     //console.log(window.getComputedStyle($plane[0])['OTransform'])
     //console.log(window.getComputedStyle($plane[0])['MozTransform'])
-    console.log(window.getComputedStyle($plane[0])['webkitTransform'])
+    // console.log(window.getComputedStyle($plane[0])['webkitTransform'])
     //console.log(window.getComputedStyle($plane[0])['webkitTransformStyle'])
   })
   </script>
