@@ -131,6 +131,30 @@
         case 'matrix3d':
           this.styleMatrix(attr, value)
           break
+
+        case 'scale':
+        case 'scaleX':
+        case 'scaleY':
+        case 'scaleZ':
+        case 'scale3d':
+        case 'rotate':
+        case 'rotateX':
+        case 'rotateY':
+        case 'rotateZ':
+        case 'rotate3d':
+        case 'translate':
+        case 'translateX':
+        case 'translateY':
+        case 'translateZ':
+        case 'translate3d':
+        case 'skew':
+        case 'skewX':
+        case 'skewY':
+          break
+
+        default:
+          this.style(attr, value)
+          break
       }
     },
 
@@ -153,7 +177,7 @@
       this.style('transform', str)
     },
 
-    
+
     animate: function () {
       //
     },
@@ -324,9 +348,7 @@
   function getProp(el, propName) {
     var i = 0,
         withPrefix
-    if (propName in el.style) {
-      return propName
-    } else {
+    if (!(propName in el.style)) {
       propName = propName.charAt(0).toUpperCase() + propName.substr(1)
       for (; i < prefixLen; i++) {
         withPrefix = prefix[i] + propName
@@ -335,6 +357,7 @@
         }
       }
     }
+    return propName
   }
 
   /**
