@@ -98,11 +98,10 @@
   CssTransform.prototype = {
 
     update: function (args) {
-      var attr = args[0],
+      var self = this,
+          attr = args[0],
           value = args[1],
-          i,
-          len,
-          str
+          matrix
 
       switch (attr) {
         case 'transform':
@@ -133,9 +132,26 @@
           break
 
         case 'scale':
+          matrix = getMatrix(this.el) || MATRIX_3D
+          matrix[0] = parseFloat(value)
+          matrix[(matrix.length > 6) ? 5 : 3] = parseFloat((2 in args) ? args[2] : value)
+          this.styleMatrix((matrix.length > 6) ? 'matrix3d' : 'matrix', matrix)
+          break
         case 'scaleX':
+          matrix = getMatrix(this.el) || MATRIX_3D
+          matrix[0] = parseFloat(value)
+          this.styleMatrix((matrix.length > 6) ? 'matrix3d' : 'matrix', matrix)
+          break
         case 'scaleY':
+          matrix = getMatrix(this.el) || MATRIX_3D
+          matrix[(matrix.length > 6) ? 5 : 3] = parseFloat(value)
+          this.styleMatrix((matrix.length > 6) ? 'matrix3d' : 'matrix', matrix)
+          break
         case 'scaleZ':
+          matrix = getMatrix(this.el) || MATRIX_3D
+          matrix[(matrix.length > 6) ? 5 : 3] = parseFloat(value)
+          this.styleMatrix((matrix.length > 6) ? 'matrix3d' : 'matrix', matrix)
+          break
         case 'scale3d':
         case 'rotate':
         case 'rotateX':
@@ -184,6 +200,14 @@
 
     prop: function (attr) {
       return getProp(this.el, attr)
+    },
+
+    matrix3d: function () {
+      var m = getMatrix(this.el)
+      if (m.length <= 6) {
+        
+      }
+      return m
     }
   }
 
