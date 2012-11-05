@@ -28,10 +28,8 @@
 
 /*    -webkit-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);*/
     /*-webkit-transform: translate3d(100px, 150px, 200px);*/
-    -webkit-transform: translateZ(100px) skewX(10deg) skewY(15deg)
-    /*-moz-transform: rotate(45deg) translateZ(100px);*/
-    /*-o-transform: rotate(45deg);*/
-  }
+    /*-webkit-transform: translateZ(100px) skewX(10deg) skewY(15deg);
+*/  }
   </style>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
@@ -44,9 +42,18 @@
         plane = $plane[0]
 
     //console.log(window.getComputedStyle(plane)['webkitTransform'])
+    // console.log($plane.csstransform('matrix'))
+    // console.log($plane.csstransform('skewY'))
+    // console.log($plane.csstransform('skewX') * 180 / Math.PI)
+
+    //$plane.csstransform('transform', 'rotateX(45deg)')
+    //console.log($plane.csstransform('transform'))
+
+    // $plane.csstransform('matrix', [0.7071067811865475, 0.7071067811865476, -0.7071067811865476, 0.7071067811865475, 0, 0])
+    // console.log($plane.csstransform('matrix'))
+
+    $plane.csstransform('matrix3d', [1, 0, 0, 0, 0, 0.7071067811865475, 0.7071067811865476, 0, 0, -0.7071067811865476, 0.7071067811865475])
     console.log($plane.csstransform('matrix'))
-    console.log($plane.csstransform('skewY'))
-    console.log($plane.csstransform('skewX') * 180 / Math.PI)
   })
   </script>
 </head>

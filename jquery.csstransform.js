@@ -17,10 +17,11 @@
 
   
   $.fn.csstransform = function() {
-    var argsLen = arguments.length
+    var args = arguments,
+        argsLen = args.length
 
     if (argsLen === 1) {
-      switch (arguments[0]) {
+      switch (args[0]) {
         case 'transform':
         case 'transformOrigin':
         case 'transform-origin':
@@ -29,7 +30,7 @@
         case 'perspective':
         case 'perspectiveOrigin':
         case 'perspective-origin':
-          return getStyle(this[0], arguments[0])
+          return getStyle(this[0], args[0])
 
         case 'matrix':
           return getMatrix(this[0]) || MATRIX
@@ -54,9 +55,10 @@
         case 'skew':
         case 'skewX':
         case 'skewY':
-          return getStyleFromMatrix(this[0], arguments[0])
+          return getStyleFromMatrix(this[0], args[0])
+
         default:
-          return this.css(arguments[0])
+          return this.css(args[0])
       }
     }
 
@@ -70,14 +72,13 @@
         $el.data('csstransform', transform)
       }
 
-      return transform.execute(arguments)
+      if (argsLen >= 2) {
+        transform.update(args)
+      }      
     })
   }
 
-  $.fn.csstransform.defaultSettings = {
-    matrix2d: null,
-    matrix3d: null
-  }
+  $.fn.csstransform.defaultSettings = {}
 
 
   $.fn.csstransform.degrees = function (radians) {
@@ -96,22 +97,13 @@
 
   CssTransform.prototype = {
 
-    execute: function (args) {
-      var arg0 = args[0],
-          arg1 = args[1]
-      return this.set(arg0, arg1)
-    },
+    update: function (args) {
+      var attr = args[0],
+          value = args[1],
+          i,
+          len,
+          str
 
-    style: function (prop, value) {
-      var propCamel = prop.charAt(0).toUpperCase() + prop.substr(1)
-      this.el.style['ms' + propCamel] = value
-      this.el.style['webkit' + propCamel] = value
-      this.el.style['Moz' + propCamel] = value
-      this.el.style['O' + propCamel] = value
-      this.el.style[prop] = value
-    },
-
-    set: function (attr, value) {
       switch (attr) {
         case 'transform':
           this.style('transform', value)
@@ -133,9 +125,35 @@
         case 'perspective-origin':
           this.style('perspectiveOrigin', value)
           break
+
+        // Pass in an array of numeric matrix values.
+        case 'matrix':
+        case 'matrix3d':
+          this.styleMatrix(attr, value)
+          break
       }
     },
 
+
+    style: function (propName, value) {
+      propName = this.prop(propName)
+      this.el.style[propName] = value
+    },
+
+
+    styleMatrix: function(matrixType, value) {
+      var arr = (matrixType === 'matrix') ? MATRIX : MATRIX_3D,
+          str = (matrixType === 'matrix') ? 'matrix(' : 'matrix3d(',
+          i, len
+      for (i = value.length, len = arr.length; i < len; i++) {
+        value[i] = arr[i]
+      }
+      str += value.join(', ')
+      str += ')'
+      this.style('transform', str)
+    },
+
+    
     animate: function () {
       //
     },
