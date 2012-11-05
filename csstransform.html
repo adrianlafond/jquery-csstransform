@@ -22,12 +22,13 @@
     width: 360px; height: 360px;
     background: #f00;
     /*-webkit-transform: scale(2, 0.5);*/
-    -webkit-transform: rotate(45deg);
+    /*-webkit-transform: rotate(45deg);*/
     /*-webkit-transform: translate(100px, 200px);*/
     /*-webkit-transform: skew(5deg, 10deg);*/
 
-    /*-webkit-transform: rotateX(45deg);*/
-    /*-moz-transform: rotateX(45deg) rotateY(45deg);*/
+/*    -webkit-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);*/
+    /*-webkit-transform: translate3d(100px, 150px, 200px);*/
+    -webkit-transform: translateZ(100px) skewX(10deg) skewY(15deg)
     /*-moz-transform: rotate(45deg) translateZ(100px);*/
     /*-o-transform: rotate(45deg);*/
   }
@@ -44,12 +45,8 @@
 
     //console.log(window.getComputedStyle(plane)['webkitTransform'])
     console.log($plane.csstransform('matrix'))
-    console.log($plane.csstransform('rotate') * 180 / Math.PI)
-
-    //console.log(window.getComputedStyle($plane[0])['OTransform'])
-    //console.log(window.getComputedStyle($plane[0])['MozTransform'])
-    // console.log(window.getComputedStyle($plane[0])['webkitTransform'])
-    //console.log(window.getComputedStyle($plane[0])['webkitTransformStyle'])
+    console.log($plane.csstransform('skewY'))
+    console.log($plane.csstransform('skewX') * 180 / Math.PI)
   })
   </script>
 </head>

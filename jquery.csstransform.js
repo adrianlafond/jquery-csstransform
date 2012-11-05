@@ -11,7 +11,7 @@
   var prefix = ['ms', 'webkit', 'Moz', 'O'],
       prefixLen = prefix.length,
 
-      MATRIX = [1, 0, 0, 1, 0, 0],
+      MATRIX    = [1, 0, 0, 1, 0, 0],
       MATRIX_3D = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 
 
@@ -39,14 +39,18 @@
         case 'scale':
         case 'scaleX':
         case 'scaleY':
+        case 'scaleZ':
+        case 'scale3d':
         case 'rotate':
         case 'rotateX':
         case 'rotateY':
         case 'rotateZ':
+        case 'rotate3d':
         case 'translate':
         case 'translateX':
         case 'translateY':
         case 'translateZ':
+        case 'translate3d':
         case 'skew':
         case 'skewX':
         case 'skewY':
@@ -182,13 +186,13 @@
           return 1
         case 'scale':
           return [1, 1]
+        case 'scale3d':
+          return [1, 1, 1]
         case 'translate':
         case 'skew':
           return [0, 0]
         case 'translate3d':
           return [0, 0, 0]
-        case 'scale3d':
-          return [1, 1, 1]
         case 'rotate3d':
           // @see https://developer.mozilla.org/en-US/docs/CSS/transform-function
           return [0, 0, 0, 0]
@@ -197,7 +201,7 @@
     }
 
     if (matrix.length > 6) {
-      return 0
+      return getMatrixProp3d(matrix, prop)
     } else {
       return getMatrixProp2d(matrix, prop)
     }
@@ -206,9 +210,9 @@
 
 
   /**
-   * @param {array} matrix An array of matrix numbers (not the raw string transform output).
+   * @param {array} matrix An array of 2d matrix numbers (not the raw string transform output).
    * @param {string} prop The property we want a result for.
-   * @returns {number}
+   * @returns {number|array}
    */
   function getMatrixProp2d(matrix, prop) {
     switch (prop) {
@@ -219,6 +223,7 @@
       case 'scale':
         return [matrix[0], matrix[3]]
       case 'rotate':
+      case 'rotateZ':
         return Math.acos(matrix[0])
       case 'translateX':
         return matrix[4]
@@ -235,6 +240,51 @@
     }
     return 0
   } 
+
+
+  /**
+   * @param {array} matrix An array of 3d matrix numbers (not the raw string transform output).
+   * @param {string} prop The property we want a result for.
+   * @returns {number|array}
+   */
+  function getMatrixProp3d(matrix, prop) {
+    switch (prop) {
+      case 'scaleX':
+        return matrix[0]
+      case 'scaleY':
+        return matrix[5]
+      case 'scaleZ':
+        return matrix[10]
+      case 'scale':
+        return [matrix[0], matrix[5]]
+      case 'scale3d':
+        return [matrix[0], matrix[5], matrix[10]]
+      case 'rotateX':
+        return Math.acos(matrix[5])
+      case 'rotateY':
+        return Math.asin(matrix[8])
+      case 'rotateZ':
+        return Math.acos(matrix[0])
+      case 'rotate3d':
+        return matrix
+      case 'translateX':
+        return matrix[12]
+      case 'translateY':
+        return matrix[13]
+      case 'translateZ':
+        return matrix[14]
+      case 'translate3d':
+        return [matrix[12], matrix[13], matrix[14]]
+      case 'skewX':
+        return Math.atan(matrix[4])
+      case 'skewY':
+        return Math.atan(matrix[1])
+      case 'skew':
+        return [Math.atan(matrix[4]), Math.atan(matrix[1])]
+    }
+    return 0
+  } 
+
 
 
   function convertMatrixToArray(matrix) {
